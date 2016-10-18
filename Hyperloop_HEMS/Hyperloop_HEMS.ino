@@ -3,26 +3,22 @@
 
 #include "HEMS.h"
 
-#define SERIAL_BAUD_RATE 9600
+#define DIAGNOSTICS_MODE	0	// 0 = OFF, 1 = ON.
 
 void setup() {
-  //Select appropriate calibration data stored in LEMS.h
-  select_engine(CURRENT_ENGINE);
-
-  #ifdef CALIBRATION_MODE
+  #if DIAGNOSTICS_MODE
   Serial.begin(SERIAL_BAUD_RATE);
   Serial.println("Hyperloop Hover Engine Monitoring System");
-  Serial.println("Calibration Mode Activated");
-  Serial.println("Current Calibration Settings:");
-
-  #endif //CALIBRATION_MODE
+  Serial.println("Diagnostics Mode Activated");
+  print_calibration_settings();
+  #endif //DIAGNOSTICS_MODE
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   record_temperatures();
 
-  #ifdef CALIBRATION_MODE
+  #ifdef DIAGNOSTICS_MODE
   //Print Results
   
 
