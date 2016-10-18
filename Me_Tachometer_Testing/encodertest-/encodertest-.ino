@@ -14,7 +14,8 @@
 #define SwitchPin 0 // micro switch is connected to this pin (pin 0) 
 #define LCDTxPin 13 // LCD connected to this pin (pin 13) 
 #define DummyRxPin 13 // Not used by LCD Board, can be any unused pin 
-#define EncoderPin 2 // break-beam sensor connected to this pin (pin 2, must be pin 2 or 3 since they have hardware interrupts 0 and 1, respectively) 
+#define Interrupt0 2 // break-beam sensor connected to this pin (pin 2, must be pin 2 or 3 since they have hardware interrupts 0 and 1, respectively) 
+#define Interrupt1 2 // break-beam sensor connected to this pin (pin 2, must be pin 2 or 3 since they have hardware interrupts 0 and 1, respectively) 
 #define SPEED 200 // Set Speed to be used for 
 #define LowSPEED 150 
 #define MediumSPEED 200
@@ -42,9 +43,14 @@ mySerial.print("?f"); //Sends clear screen command to LCD
 delay(20); //Gives the LCD time to execute command 
 pinMode(SwitchPin, INPUT); //Makes Switch Pin an input 
 digitalWrite(SwitchPin, HIGH); //Enables the pull-up resistor on Switch Pin 
-pinMode(EncoderPin, INPUT); //Makes Encoder Pin an input 
-digitalWrite(EncoderPin, HIGH); //Enables the pull-up resistor on Encoder Pin (Pin 2) 
-attachInterrupt(0, countTick, FALLING); //Set routine to run (countTick) and interrupt trigger: FALLING (when pin 2 voltage goes from high to low, countTick will run) 
+pinMode(Interrupt0, INPUT); //Makes Encoder Pin an input 
+pinMode(Interrupt1, INPUT); //Makes Encoder Pin an input 
+
+digitalWrite(Interrupt0, HIGH); //Enables the pull-up resistor on Encoder Pin (Pin 2) 
+digitalWrite(Interrupt1, HIGH); //Enables the pull-up resistor on Encoder Pin (Pin 3) 
+
+attachInterrupt(digitalPinToInterrupt(Interrupt0), countTick, FALLING); //Set routine to run (countTick) and interrupt trigger: FALLING (when pin 2 voltage goes from high to low, countTick will run) 
+attachInterrupt(digitalPinToInterrupt(Interrupt1), countTick, FALLING); //Set routine to run (countTick) and interrupt trigger: FALLING (when pin 3 voltage goes from high to low, countTick will run) 
 
 pinMode(LowPin, INPUT); //Makes Switch Pin an input 
 digitalWrite(LowPin, HIGH); //Enables the pull-up resistor on Switch Pin 
