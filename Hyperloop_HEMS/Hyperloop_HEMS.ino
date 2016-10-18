@@ -1,20 +1,13 @@
 //Hyperloop Hover Engine Monitoring System
 //Kevin Kha
 
-#define CURRENT_ENGINE 0 //0-5
-
-//Uncomment below if calibrating with computer.
-//#define CALIBRATION_MODE
-
 #include "HEMS.h"
 
 #define SERIAL_BAUD_RATE 9600
 
-cal_data calibration;
-
 void setup() {
   //Select appropriate calibration data stored in LEMS.h
-  calibration = select_engine(CURRENT_ENGINE);
+  select_engine(CURRENT_ENGINE);
 
   #ifdef CALIBRATION_MODE
   Serial.begin(SERIAL_BAUD_RATE);
@@ -27,5 +20,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  record_temperatures();
 
+  #ifdef CALIBRATION_MODE
+  //Print Results
+  
+
+  #endif //CALIBRATION_MODE
 }
