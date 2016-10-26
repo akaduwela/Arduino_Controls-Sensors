@@ -5,15 +5,36 @@
 
 // Global variables.
 int recorded_temp[NUM_THERMISTORS];
-int res_ref;
+unsigned long int current_time_us = 0;
+unsigned long int previous_time_us = 0;
+volatile unsigned int tach_period_us = 0;
+
+void tachometer_handler() {
+  //This function uses micros(), which overflows (resets back to 0) after ~70 minutes.
+  current_time_us = micros();
+  tach_period_us = (tach_period_us*TACHOMETER_AVG_WEIGHT + (10 - TACHOMETER_AVG_WEIGHT) * (current_time_us - previous_time_us))/10;
+  previous_time_us = current_time_us + TACHOMETER_HANDLER_OVERHEAD_US;
+}
 
 void record_temperatures() {
-  int ratio, thermistance;
+  unsigned long int ratio, thermistance;
   for (int temp_counter = 0; temp_counter < NUM_THERMISTORS; temp_counter++) {
-    ratio = map(analogRead(thermistor_pins[temp_counter]), 0, 1023, 0, 100);
-    thermistance = (100 - ratio) * REFERENCE_RESISTANCE / ratio;
-    recorded_temp[temp_counter] = (8 * (beta_values[temp_counter] / (log(thermistance) - offset_values[temp_counter]) - 273) + 2 * recorded_temp[temp_counter]) / 10;
+    ratio = analogRead(thermistor_pins[temp_counter]);
+    thermistance = (1023 - ratio) * REFERENCE_RESISTANCE / ratio;
+    recorded_temp[temp_counter] = ((100 - THERMISTOR_AVG_WEIGHT) * (beta_values[temp_counter] / (log(thermistance) - offset_values[temp_counter]) - 273) + THERMISTOR_AVG_WEIGHT * recorded_temp[temp_counter]) / 100;
   }
+}
+
+void print_temperatures() {
+  for (int temp_counter = 0; temp_counter < NUM_THERMISTORS; temp_counter++) {
+    Serial.print(recorded_temp[temp_counter]);
+    Serial.print("\t");
+  }
+}
+
+void print_tachometer_period() {
+  Serial.print(tach_period_us);
+  Serial.print("\t");
 }
 
 void print_calibration_settings() {
