@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 ./*
   Sample code to control the position of an actuator with potentiometer feedback using a MegaMoto.
 
@@ -66,7 +56,7 @@ void loop()
 /********************* Function Start *****************************/
 /*******************************************************************/
 /****************************************/
-/* Function: getDeestination()          */
+/* Function: getDestination()          */
 /*                                      */
 /* Parameters: none                     */
 /*                                      */
@@ -90,8 +80,8 @@ int getDestination()
 /* Return:     void                     */
 /*                                      */
 /* Description:                         */
-/*                                      */
-/*                                      */
+/*   Pushes Actuator until stop         */
+/*   destination reached.               */
 /****************************************/
 void pushActuatorUntilStop(int destination)
 {
@@ -110,7 +100,17 @@ void pushActuatorUntilStop(int destination)
   delay(25);
   stopActuator();
 }//end pushActuatorUntilStop
-
+/****************************************/
+/* Function:   pullActuatorUnilStop     */
+/*                                      */
+/* Parameters: int; desitnation         */
+/*                                      */
+/* Return:     void                     */
+/*                                      */
+/* Description:                         */
+/*   Pulls Actuator until stop          */
+/*   destination reached.               */
+/****************************************/
 void pullActuatorUntilStop(int destination)
 {
   destination = getDestination();
@@ -128,19 +128,49 @@ void pullActuatorUntilStop(int destination)
   delay(25);
   stopActuator();
 }//end pullActuatorUntilStop
-
+/****************************************/
+/* Function:   stopActuator             */
+/*                                      */
+/* Parameters: none                     */
+/*                                      */
+/* Return:     void                     */
+/*                                      */
+/* Description:                         */
+/*   Sends stop signal to actuator.     */
+/*                                      */
+/****************************************/
 void stopActuator()
 {
  digitalWrite(R1,HIGH);
  digitalWrite(R2,HIGH);
 }//end stopActuator
-
+/****************************************/
+/* Function:   pushActuator             */
+/*                                      */
+/* Parameters: none                     */
+/*                                      */
+/* Return:     void                     */
+/*                                      */
+/* Description:                         */
+/*   Sends push signal to actuator.     */
+/*                                      */
+/****************************************/
 void pushActuator()
 { 
   digitalWrite(R1,HIGH);
   digitalWrite(R2,LOW);
 }//end pushActuator
-
+/****************************************/
+/* Function:   pullActuator             */
+/*                                      */
+/* Parameters: none                     */
+/*                                      */
+/* Return:     void                     */
+/*                                      */
+/* Description:                         */
+/*   Sends pull signal to actuator.     */
+/*                                      */
+/****************************************/
 void pullActuator()
 {
   digitalWrite(R1,LOW);
