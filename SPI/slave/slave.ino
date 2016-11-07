@@ -13,6 +13,7 @@ void ss_falling ()
 void setup (void)
 {
 
+  Serial.begin(115200);
   // have to send on master in, *slave out*
   pinMode(MISO, OUTPUT);
 
@@ -27,13 +28,16 @@ void setup (void)
   
 }  // end of setup
 
+//byte c;
 
 // SPI interrupt routine
 ISR (SPI_STC_vect)
 {
   byte c = SPDR;
- 
+  
   SPDR = byte((millis() >> 8) & 0xFF);
+  Serial.println(c);
+
 
 }  // end of interrupt service routine (ISR) SPI_STC_vect
 
