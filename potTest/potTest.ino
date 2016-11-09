@@ -1,4 +1,4 @@
-#define potPin A0
+#define potPin A5
 
 void setup() {
   Serial.begin(9600);

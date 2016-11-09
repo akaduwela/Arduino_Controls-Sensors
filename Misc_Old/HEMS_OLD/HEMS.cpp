@@ -5,6 +5,7 @@
 
 // Global variables.
 int recorded_temp[NUM_THERMISTORS];
+int recorded_amps = 0;
 unsigned long int current_time_us = 0;
 unsigned long int previous_time_us = 0;
 volatile unsigned int tach_period_us = 0;
@@ -12,7 +13,7 @@ volatile unsigned int tach_period_us = 0;
 void tachometer_handler() {
   //This function uses micros(), which overflows (resets back to 0) after ~70 minutes.
   current_time_us = micros();
-  tach_period_us = (tach_period_us*TACHOMETER_AVG_WEIGHT + (10 - TACHOMETER_AVG_WEIGHT) * (current_time_us - previous_time_us))/10;
+  tach_period_us = (tach_period_us * TACHOMETER_AVG_WEIGHT + (10 - TACHOMETER_AVG_WEIGHT) * (current_time_us - previous_time_us)) / 10;
   previous_time_us = current_time_us + TACHOMETER_HANDLER_OVERHEAD_US;
 }
 
@@ -25,16 +26,25 @@ void record_temperatures() {
   }
 }
 
+void record_amps() {
+  recorded_amps = (analogRead(AMMETER) * 5000.0 / 1023 - AMMETER_VCC / 2) * AMMETER_CONVERSION;
+}
+
+void print_amps(){
+  Serial.print(recorded_amps);
+  Serial.print("A\t");
+}
+
 void print_temperatures() {
   for (int temp_counter = 0; temp_counter < NUM_THERMISTORS; temp_counter++) {
     Serial.print(recorded_temp[temp_counter]);
-    Serial.print("\t");
+    Serial.print("C\t");
   }
 }
 
-void print_tachometer_period() {
+void print_RPM() {
   Serial.print(tach_period_us);
-  Serial.print("\t");
+  Serial.print("RPM\t");
 }
 
 void print_calibration_settings() {

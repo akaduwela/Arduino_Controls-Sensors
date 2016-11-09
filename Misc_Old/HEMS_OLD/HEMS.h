@@ -1,7 +1,8 @@
 //Hyperloop Hover Engine Monitoring System
 //Kevin Kha
-#include "Arduino.h"
+#include "Arduino.h"[
 #include "math.h"
+#include "DAC_shield.h"
 
 #include "calibration.h"
 
@@ -12,15 +13,21 @@
 
 #define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //ohms
+#define AMMETER_SENSITIVITY 26.4 //mV/A
+#define AMMETER_CONVERSION 1/AMMETER_SENSITIVITY
+#define AMMETER_VCC 3.3
 
 //Pin Assignments
 #define TACHOMETER_0 2
-#define COILS_FRONT A0
-#define COILS_BACK A1
-#define INTERIOR_WALL_RIGHT A2
-#define INTERIOR_WALL_LEFT A3
-//#define THERMISTOR_4 A4
-//#define THERMISTOR_5 A5
+#define AMMETER A0
+#define COILS_FRONT A1
+#define COILS_BACK A2
+#define INTERIOR_WALL_RIGHT A3
+#define INTERIOR_WALL_LEFT A4
+#define LINEAR_FEEDBACK A5
+
+
+#define THROTTLE_DAC_PORT 2
 
 
 // Global constants.
@@ -49,9 +56,11 @@ const int thermistor_pins[] = {
 // Helper functions.
 void select_engine(int engine);
 void record_temperatures();
+void record_amps();
+void print_amps();
 void print_motor_current();
 void print_temperatures();
-void print_tachometer_period();
+void print_RPM();
 void print_calibration_settings();
 void tachometer_handler();
 #endif
