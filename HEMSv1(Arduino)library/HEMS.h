@@ -27,13 +27,19 @@ const int thermistor_pins[] = {
   COILS_FRONT, COILS_BACK, INTERIOR_WALL_RIGHT, INTERIOR_WALL_LEFT
 };
 
+//Safety Thresholds:
+#define TEMPERATURE_ALARM 100
+#define AMPS_ALARM 70
+
 // Global constants.
-#define TACHOMETER_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
-#define THERMISTOR_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100
+#define TACHOMETER_AVG_WEIGHT 0 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
+#define THERMISTOR_AVG_WEIGHT 0 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100
 #define TACHOMETER_HANDLER_OVERHEAD_US 0 //approximate overhead time for 
 
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
+
+extern int error_flag;
 
 // Helper functions.
 void record_temperatures(int *temperature_array);
