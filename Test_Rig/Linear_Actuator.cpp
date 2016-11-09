@@ -20,7 +20,7 @@ void linear_actuator_set(int destination) {
     Serial.println(currentPosition);
     if (currentPosition < destination)
       pullActuatorUntilStop(destination);// choose what action to take
-    else (currentPosition > destination)
+    else if (currentPosition > destination)
       pushActuatorUntilStop(destination);
   }
   Serial.println("In position!");
