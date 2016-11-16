@@ -19,23 +19,12 @@ void linear_actuator_set(float height_value) {
   Serial.print("Feedback Destination:\t");
   Serial.println(destination);
   if (abs(destination - analogRead(LINEAR_FEEDBACK)) > PRECISION) {
-<<<<<<< HEAD
-    currentPosition = analogRead(LINEAR_FEEDBACK); //check where you are
-    Serial.print("Current Height:\t");
-    Serial.println(map(currentPosition, HEIGHT_MAX, HEIGHT_MIN, FEEDBACK_MIN, FEEDBACK_MAX));
-    
-    // choose what action to take
-    if (currentPosition < destination) 
-      pullActuatorUntilStop(destination);
-    else if(currentPosition > destination)
-=======
     currentPosition = analogRead(LINEAR_FEEDBACK);//check where you are
     Serial.print("Current Position: \t");
     Serial.println(currentPosition);
     if (currentPosition < destination)
       pullActuatorUntilStop(destination);// choose what action to take
     else if (currentPosition > destination)
->>>>>>> origin/master
       pushActuatorUntilStop(destination);
   }
   Serial.println("In position!");
