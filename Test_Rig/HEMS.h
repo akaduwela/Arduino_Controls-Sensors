@@ -6,8 +6,6 @@
 #ifndef HEMS_H_
 #define HEMS_H_
 
-#define SERIAL_BAUD_RATE 9600
-
 #define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //ohms
 #define AMMETER_SENSITIVITY 26.4 //mV/A
