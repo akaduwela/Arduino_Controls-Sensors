@@ -6,7 +6,7 @@
 Device Addressing (7-bit addressing):
 ADC LTC2309: 0 ...						-0??10??-	//Tri-state Inputs A0 and A1, however we'll not use float (don't need that many addresses)
 IO MCP23017: 0 1 0 0 A2 A1 A0			-0100???-
-DAC MCP4725: 1 1 0 0 A2(0) A1(0) A0		-110000?-
+DAC MCP4725: 1 1 0 0 A2(0) A1(1) A0		-110001?-   //A2 and A1 are internal hardware pins; they are set when manufactured.
 
 		   _________ADC LTC2309 (Thermistors, Ammeter)
 		   ||  _____IO MCP23017 (Tachometer)
@@ -16,7 +16,7 @@ I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.
 
 const int ADC_Address[4] = {0x8, 0xA, 0x1A, 0x28};
 const int IOX_Address[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
-const int DAC_Address[2] = {0x60, 0x61};
+const int DAC_Address[2] = {0x62, 0x63};
 
 typedef struct{
 	int I2C_DIP;
@@ -38,6 +38,7 @@ Engine_Control_System ENGINE_0{
 
 	return
 }
+
 
 /*ADC LTC2309
 I2C Protocol:
@@ -78,6 +79,7 @@ const int ADC_CHANNEL_SELECT[8] = {
 	LTC2309_CHN_6 | ADC_CONFIG,
 	LTC2309_CHN_7 | ADC_CONFIG};
 
+
 /*IOX MCP23017
 The MCP23017 is a 16-bit IO Expander controlled via I2C; the device is split into two 8-bit ports.
 The device is configured by a shared configuration register, IOCON, which consists of a byte. The settings are as follows:
@@ -115,3 +117,26 @@ SEQOP = Sets whether addresses increment. (We want this active so we can read bo
 #define MCP23017_INTCAPB 0x11
 #define MCP23017_GPIOB 0x13
 #define MCP23017_OLATB 0x15
+
+
+/*DAC MCP4725
+The MCP4725 is a 12-bit single-channel DAC controlled via I2C. It has one external address bit (so only 2 devices can be used on the same bus.)
+I2C Protocol:
+	1. Write Device Address
+	2. 4-bit Configuration: 0000
+	3. 12-bit Output Data:
+
+DAC Configuration (4-bit)
+C2 | C1 | PD1 | PD0
+
+C2 = 0	Command mode bit 2 (0, 0) = Fast Command Mode 
+C1 = 0	Command mode bit 1 (0, 0) = Fast Command Mode
+PD1 = 
+PD0 = 
+
+*/
+
+#define DAC_CONFIG 0x00 //0b01000000
+
+//DAC Functions:
+void ()

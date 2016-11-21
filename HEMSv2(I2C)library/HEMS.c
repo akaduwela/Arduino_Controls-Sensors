@@ -6,26 +6,30 @@
 // Global variables.
 
 void initialize_HEMS(){
+	#ifdef ARDUINO
 	Wire.begin();
+	#endif
 
 }
 
-void read_ADC(ADC myadc, int *analog_data_array){
-	Wire.beginTransmission(myadc->ADC_DEVICE_ADDRESS);
-	Wire.write(ANALOG_DATA_ADDRESS);
-	Wire.endTransmission(0);
-	Wire.requestFrom(myadc->ADC_DEVICE_ADDRESS, NUMBER_OF_BYTES, 1);
-	
+uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel){
+	#ifdef ARDUINO
+
+	#else
+
+	#endif
 }
 
-/*
-void write_DAC(DAC mydac, int output){
-	Wire.beginTransmission(mydac->DAC_DEVICE_ADDRESS);
-	Wire.write(ANALOG_OUTPUT_ADDRESS);
-	Wire.write(output);
-	Wire.endTransmission(0);
+void DAC_write(uint8_t DAC_address, uint16_t output_voltage){
+	#ifdef ARDUINO
+	Wire.beginTransmission(DAC_address);
+    Wire.write(output_voltage >> 8);
+    Wire.write(output_voltage % 1024);
+    Wire.endTransmission();
+    #else
+
+    #endif
 }
-*/
 
 void record_temperatures(int *temperature_array) {
   unsigned long int ratio, thermistance;

@@ -18,6 +18,7 @@ extern "C" {
 #define DAC_OUT_MIN 0.00 //Lowest output voltage from DAC
 #define DAC_OUT_MAX 3.56 //Highest output voltage from DAC
 #define MIN_PERIOD_US 25000
+#define MIN_PERIOD_MS 25
 
 // Helper functions.
 void rig_initialize();

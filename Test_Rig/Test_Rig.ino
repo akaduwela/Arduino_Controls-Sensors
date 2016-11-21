@@ -17,6 +17,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   record_temperatures(recorded_temps);
+  record_amps(&recorded_amps);
 
   /*----------------------------------Print Results*/
   Serial.print(millis() / 1000.0);
@@ -31,10 +32,11 @@ void loop() {
 
 void tachometer_handler() {
   //This function uses micros(), which overflows (resets back to 0) after ~70 minutes.
-  current_time_us = micros(); 
-  tach_period_us = (tach_period_us * TACHOMETER_AVG_WEIGHT + (10 - TACHOMETER_AVG_WEIGHT) * (current_time_us - previous_time_us)) / 10;
-  if (tach_period_us > MIN_PERIOD_US) { //debouncing
-    recorded_RPM = 1000000 / tach_period_us * 60;
+  current_time_us = millis(); 
+  tach_period_us = (tach_period_us * TACHOMETER_AVG_WEIGHT + (100 - TACHOMETER_AVG_WEIGHT) * (current_time_us - previous_time_us)) / 100;
+  if (tach_period_us > MIN_PERIOD_MS) { //debouncing
+    //recorded_RPM = 1000.0 / tach_period_us * 60;
+    recorded_RPM++;
     previous_time_us = current_time_us + TACHOMETER_HANDLER_OVERHEAD_US;
   }
 }

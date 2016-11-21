@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 #endif
+
 #include "math.h"
 
 #ifndef HEMS_H_
@@ -25,9 +26,6 @@
 #define INTERIOR_WALL_RIGHT 2
 #define INTERIOR_WALL_LEFT 3
 #define AMMETER 4
-const int thermistor_pins[] = {
-  COILS_FRONT, COILS_BACK, INTERIOR_WALL_RIGHT, INTERIOR_WALL_LEFT
-};
 
 //Global Constants:
 #define TACHOMETER_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
@@ -37,17 +35,10 @@ const int thermistor_pins[] = {
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
 
-//ADC Parameters:
-typedef struct {
-	int ADC_DEVICE_ADDRESS; //Determined by two tri-state hardware pins AD0 and AD1.
-	int 
-
-} ADC;
-
-#ifdef Arduino
 void initialize_HEMS();
-void read_ADC(int *analog_data_array);
-#endif
+uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel);
+uint16_t IOX_read(uint8_t IOX_address);
+void DAC_write(uint8_t DAC_address, uint16_t output_voltage);
 
 //Functions Declarations:
 void record_temperatures(int *temperature_array);

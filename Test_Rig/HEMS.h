@@ -9,8 +9,8 @@
 #define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //ohms
 #define AMMETER_SENSITIVITY 26.4 //mV/A
-#define AMMETER_CONVERSION 1/AMMETER_SENSITIVITY
-#define AMMETER_VCC 3.3
+#define AMMETER_CONVERSION 0.0379 //A/mV
+#define AMMETER_VCC 3300 //mV
 
 //Digital Pin Assignments
 #define TACHOMETER_0 2
@@ -30,7 +30,7 @@ const int thermistor_pins[] = {
 #define AMPS_ALARM 70
 
 // Global constants.
-#define TACHOMETER_AVG_WEIGHT 0 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
+#define TACHOMETER_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
 #define THERMISTOR_AVG_WEIGHT 0 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100
 #define TACHOMETER_HANDLER_OVERHEAD_US 0 //approximate overhead time for 
 

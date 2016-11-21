@@ -26,7 +26,7 @@ void record_temperatures(int *temperature_array) {
 
 void record_amps(int* recorded_amps) {
   //Calculate ammeter code
-  int amps = (analogRead(AMMETER) * 5000.0 / 1023 - AMMETER_VCC / 2) * AMMETER_CONVERSION;
+  int amps = abs(analogRead(AMMETER) * 5000.0 / 1023.0 - AMMETER_VCC / 2) * AMMETER_CONVERSION;
   *recorded_amps = amps;
   
   if(amps > AMPS_ALARM)
