@@ -34,14 +34,18 @@ void setup(void) {
 void loop(void) {
     uint32_t counter;
     // Run through the full 12-bit scale for a triangle wave
-    for (counter = 0; counter < 4095; counter++)
-    {
+    for (counter = 0; counter < 4095; counter++)  {
       dac.setVoltage(counter, false);
+      Serial.print(counter);
+      Serial.print("\t");
       Serial.println(analogRead(A0));
+      delay(1000);
     }
-    for (counter = 4095; counter > 0; counter--)
-    {
+    for (counter = 4095; counter > 0; counter--)  {
       dac.setVoltage(counter, false);
+      Serial.print(counter);
+      Serial.print("\t");
       Serial.println(analogRead(A0));
+      delay(1000);
     }
 }

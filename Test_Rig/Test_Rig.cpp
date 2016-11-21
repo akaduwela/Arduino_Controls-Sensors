@@ -4,7 +4,7 @@
 #include "Test_Rig.h"
 
 // Global variables.
-//DAC_shield throttle;
+DAC_shield throttle;
 String inputString = "";
 float Throttle_value = 0;
 float height_value = 0;
@@ -15,8 +15,8 @@ void rig_initialize(){
   Serial.println("Diagnostics Mode Activated");
 
   //Setup throttle
-  //throttle.prep();
-  //throttle.set(THROTTLE_DAC_PORT, 0);
+  throttle.prep();
+  throttle.set(THROTTLE_DAC_PORT, 0);
   //Serial.println("Typing in a number between 0 and 255 will change the throttle.");
   inputString.reserve(5);
 
@@ -49,13 +49,11 @@ void print_RPM(int RPM) {
   Serial.print("RPM\t");
 }
 
-/*
-void set_RPM(int target_RPM) {
+void set_Throttle(int target_Throttle) {
   Serial.print("New Throttle Value: ");
-  Serial.println(target_RPM);
-  throttle.set(THROTTLE_DAC_PORT, target_RPM);
+  Serial.println(target_Throttle);
+  throttle.set(THROTTLE_DAC_PORT, target_Throttle);
 }
-*/
 
 void set_Height(float target_Height) {
   Serial.print("Linear Actuator Set: ");
@@ -69,7 +67,7 @@ void emergency_shutdown(int error){
     Serial.print("STOP");
 
     //Shut down the engine (throttle -> 0);
-    //throttle.set(THROTTLE_DAC_PORT, 0);
+    throttle.set(THROTTLE_DAC_PORT, 0);
   }
   else
   Serial.print("OK"); 
@@ -85,7 +83,7 @@ void serialEvent() {
       //Execute the command with the value stored in the rest of the input.
       if (command_char == 'T'){
         Throttle_value = constrain(inputString.substring(1).toFloat(), THROTTLE_MIN, THROTTLE_MAX); //make sure the throttle input is within allowable bounds
-        //set_Throttle(Throttle_value);
+        set_Throttle(Throttle_value);
       }
       else if (command_char == 'H'){ //Set the height
         height_value = constrain(inputString.substring(1).toFloat(), HEIGHT_MIN, HEIGHT_MAX); //make sure the height input is within allowable bounds
