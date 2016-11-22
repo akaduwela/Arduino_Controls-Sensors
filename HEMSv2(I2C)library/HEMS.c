@@ -13,7 +13,6 @@ void initialize_HEMS(){
 
 
 	#endif //ARDUINO
-	return IOX_value;
 }
 
 uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel){
@@ -34,7 +33,7 @@ uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel){
 void IOX_setup(uint8_t IOX_address){
 	#ifdef ARDUINO
 	Wire.beginTransmission(IOX_address);
-	Wire.write(); //IOCON register location
+	Wire.write(IOX_IOCON_INITIAL_ADDRESS); //IOCON register location
 	Wire.write(IOX_CONFIG);
 	Wire.endTransmission(true);
 	

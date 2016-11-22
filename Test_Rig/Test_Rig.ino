@@ -2,10 +2,19 @@
 //Kevin Kha
 
 #include "Test_Rig.h"
+/*
 volatile int recorded_RPM = 0;
+volatile int previous_RPM = 0;
+volatile int current_RPM = 0;
+*/
+float recorded_RPM = 0;
+float previous_RPM = 0;
+float current_RPM = 0;
 volatile uint16_t rotation_count = 0;
 uint16_t old_rotation_count = 0;
-uint8_t counts = 0;
+float counts = 0;
+float numStrips=3;
+
 int recorded_temps[NUM_THERMISTORS];
 int recorded_amps = 0;
 
@@ -35,11 +44,22 @@ void loop() {
   Serial.print(millis() / 1000.0);
   Serial.print("s\t");
 
-  current_time_us = millis(); 
+/*  
+   
+ current_time_us = millis(); 
   counts = ((rotation_count - old_rotation_count) * (100 - TACHOMETER_AVG_WEIGHT) + counts * TACHOMETER_AVG_WEIGHT) / 100;
   recorded_RPM = 60000.0 * counts / (current_time_us - previous_time_us);
   old_rotation_count = rotation_count;
   previous_time_us = current_time_us;
+*/
+
+  current_time_us = micros(); 
+  counts = (rotation_count - old_rotation_count)/numStrips;
+  previous_RPM = recorded_RPM; //assign RPM from previous loop to previous RPM
+  current_RPM = 60000000.0 * counts / (current_time_us - previous_time_us); 
+  recorded_RPM = ((100-TACHOMETER_AVG_WEIGHT) * current_RPM + TACHOMETER_AVG_WEIGHT * previous_RPM)/100;
+  old_rotation_count = rotation_count; 
+  previous_time_us = current_time_us;  
 
   Serial.print(rotation_count);
   Serial.print("\t");

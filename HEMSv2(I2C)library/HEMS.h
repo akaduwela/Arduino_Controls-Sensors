@@ -123,13 +123,20 @@ The device is configured by a shared configuration register, IOCON, which consis
 IOX Configuration Byte (8-bit):
 BANK | MIRROR | SEQOP | DISSLW | HAEN | ODR | INTPOL | NC
 
-BANK = Sets the addressing of the registers of each port. (We'll want them to be sequential, so = 1)
+BANK = Sets the addressing of the registers of each port. (We want them to alternate, so = 0)
 MIRROR = Sets whether the Interrupt outputs are OR'd together. (We want this active for the BMS, so = 1) Does not affect tachometer
-SEQOP = Sets whether addresses increment. (We only ever want to read the GPIO which is taken care of by BANK, so = 1)
+SEQOP = Sets whether addresses increment. (We want to operate in Byte mode, not Sequential, so = 1)
+DISSLW = Sets slew rate function
+HAEN = Don't care; controls hardware addressing on the 23S17
+ODR = 
+INTPOL = 
 
 */
-#define IOX_CONFIG 0x62//0b1100010
+#define IOX_CONFIG //0b0110010
 
+#define IOX_IOCON_INITIAL_ADDRESS 0x05
+
+//Banked Addresses (IOCON.BANK = 1)
 #define MCP23017_IODIRA 0x00
 #define MCP23017_IPOLA 0x02
 #define MCP23017_GPINTENA 0x04
