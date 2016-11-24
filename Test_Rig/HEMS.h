@@ -8,8 +8,8 @@
 
 #define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //ohms
-#define AMMETER_SENSITIVITY 26.4 //mV/A
-#define AMMETER_CONVERSION 0.0379 //A/mV
+#define AMMETER_SENSITIVITY 8.7 //mV/A
+#define AMMETER_CONVERSION 0.115 //A/mV
 #define AMMETER_VCC 3300 //mV
 
 //Digital Pin Assignments

@@ -33,7 +33,7 @@ uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel){
 void IOX_setup(uint8_t IOX_address){
 	#ifdef ARDUINO
 	Wire.beginTransmission(IOX_address);
-	Wire.write(IOX_IOCON_INITIAL_ADDRESS); //IOCON register location
+	Wire.write(MCP23017_IOCONA); //IOCON register location
 	Wire.write(IOX_CONFIG);
 	Wire.endTransmission(true);
 	
@@ -43,14 +43,16 @@ void IOX_setup(uint8_t IOX_address){
 }
 
 uint16_t IOX_read(uint8_t IOX_address){
-	#ifdef ARDUINO
-	Wire.beginTransmission(IOX_address);
-	Wire.write(); //GPIOAB register location
-	Wire.endTransmission(true);
-	
-	#else //LPC code
+  #ifdef ARDUINO
+  Wire.beginTransmission(IOX_address);
+  Wire.write(MCP23017_GPIOA); //GPIOAB register location
+  Wire.endTransmission(false);
+  Wire.requestFrom(IOX_address, 2, true);
+  uint16_t IOX_value = (Wire.read() << 8) | Wire.read();	//A7 A6 A5 A4 A3 A2 A1 A0 B7 B6 B5 B4 B3 B2 B1 B0
+  #else //LPC code
 
-	#endif //ARDUINO
+  #endif //ARDUINO
+  return IOX_value;
 }
 
 

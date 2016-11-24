@@ -15,9 +15,9 @@
 #define HEMS_H_
 
 #define NUM_THERMISTORS 4
-#define REFERENCE_RESISTANCE 5100 //ohms
-#define AMMETER_SENSITIVITY 26.4 //mV/A
-#define AMMETER_CONVERSION 1/AMMETER_SENSITIVITY
+#define REFERENCE_RESISTANCE 5100 	//[ohms]
+#define AMMETER_SENSITIVITY 8.7		//[mV/A] for the 150B version of the sensor
+#define AMMETER_CONVERSION 0.115	//[A/mV] 1/AMMETER_SENSITIVITY
 #define AMMETER_VCC 3.3
 
 //ADC Channel Assignments
@@ -121,22 +121,20 @@ The MCP23017 is a 16-bit IO Expander controlled via I2C; the device is split int
 The device is configured by a shared configuration register, IOCON, which consists of a byte. The settings are as follows:
 
 IOX Configuration Byte (8-bit):
-BANK | MIRROR | SEQOP | DISSLW | HAEN | ODR | INTPOL | NC
+BANK | MIRROR | SEQOP | DISSLW | HAEN | ODR | INTPOL | NC 				POR (Power-On Reset) : 00000000
 
 BANK = Sets the addressing of the registers of each port. (We want them to alternate, so = 0)
 MIRROR = Sets whether the Interrupt outputs are OR'd together. (We want this active for the BMS, so = 1) Does not affect tachometer
 SEQOP = Sets whether addresses increment. (We want to operate in Byte mode, not Sequential, so = 1)
 DISSLW = Sets slew rate function
 HAEN = Don't care; controls hardware addressing on the 23S17
-ODR = 
-INTPOL = 
+ODR = ?
+INTPOL = ?
 
 */
-#define IOX_CONFIG //0b0110010
+#define IOX_CONFIG //0b01100010
 
-#define IOX_IOCON_INITIAL_ADDRESS 0x05
-
-//Banked Addresses (IOCON.BANK = 1)
+//Banked Addresses (IOCON.BANK = 0) This is also the default register mapping.
 #define MCP23017_IODIRA 0x00
 #define MCP23017_IPOLA 0x02
 #define MCP23017_GPINTENA 0x04
