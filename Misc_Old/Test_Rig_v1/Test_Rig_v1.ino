@@ -1,7 +1,7 @@
 //Hyperloop Hover Engine Monitoring System
 //Kevin Kha
 
-#include "Test_Rig.h"
+#include "Test_Rig_v1.h"
 /*
 volatile int recorded_RPM = 0;
 volatile int previous_RPM = 0;

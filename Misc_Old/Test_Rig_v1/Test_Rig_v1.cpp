@@ -1,7 +1,7 @@
 //Hyperloop Hover Engine Monitoring System
 //Kevin Kha
 
-#include "Test_Rig.h"
+#include "Test_Rig_v1.h"
 
 // Global variables.
 DAC_shield throttle;
