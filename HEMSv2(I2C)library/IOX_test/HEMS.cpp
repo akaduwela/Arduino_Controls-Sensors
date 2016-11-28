@@ -14,12 +14,7 @@ HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP) {
   engine->IOX_0_device_address = IOX_Address_Select[(I2C_DIP >> 0) & 0b111];
 
   IOX_setup(engine->IOX_0_device_address);
-  
-  engine->throttle_voltage = 0;
-  engine->timestamp = 0;
-  engine->tachometer_counter = 0;
-  engine->alarm = 0;
-  
+
   return engine;
 }
 

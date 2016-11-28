@@ -50,11 +50,11 @@ void loop() {
     Wire.write(i % 1024);
     Wire.endTransmission(true);
     
-    uint16_t ADC_data = ADC_read(ADC_Address[0], 0);
+    uint16_t ADC_data = ADC_read(ADC_Address[0], 7);
     
     Serial.print(i);
     Serial.print("\t");
-    Serial.print(analogRead(A0)*4);
+    //Serial.print(analogRead(A0)*4);
     Serial.print("\t");
     Serial.println(ADC_data);
     /**/

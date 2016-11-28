@@ -27,7 +27,7 @@ void setup() {
   Wire.begin();
 
   //Setup HEMS
-  myhems = initialize_HEMS(0, 0b00000000);
+  myhems = initialize_HEMS(0, 0b00000001);
   delay(2000);
 }
 

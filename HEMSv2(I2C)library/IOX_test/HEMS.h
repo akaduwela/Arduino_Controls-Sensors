@@ -53,15 +53,15 @@ typedef struct{
   //Data Storage
   uint8_t temperatures[NUM_THERMISTORS];
   uint8_t amps;
-  float throttle_voltage;     
+  float throttle_voltage = 0.0;     
   uint8_t rpm;
 
   //Helper Data
-  float timestamp;
-  uint16_t tachometer_counter;
+  float timestamp = 0;
+  uint16_t tachometer_counter = 0;
 
   //Diagnostics
-  uint8_t alarm;
+  uint8_t alarm = 0;
 } HEMS;
 
 HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP);  //See below for I2C DIP addressing
