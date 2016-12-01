@@ -127,7 +127,7 @@ const uint8_t ADC_CHANNEL_SELECT[8] = {
 	LTC2309_CHN_7 | ADC_CONFIG};
 
 //ADC Associated Functions:
-uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel);
+uint16_t ADC_read(uint8_t i2c_bus, uint8_t ADC_address, uint8_t ADC_channel);
 
 
 
@@ -157,7 +157,7 @@ There are other modes that allow for greater configuration (like writing to the 
 #define DAC_MAX 5.00
 
 //DAC Associated Functions:
-void DAC_write(uint8_t DAC_address, uint16_t output_voltage);
+void DAC_write(uint8_t i2c_bus, uint8_t DAC_address, uint16_t output_voltage);
 
 
 
@@ -206,8 +206,8 @@ INTPOL = ?
 #define MCP23017_OLATB 0x15
 
 //IOX Associated Functions:
-void IOX_setup(uint8_t IOX_address);
-uint16_t IOX_read(uint8_t IOX_address);
+void IOX_setup(uint8_t i2c_bus, uint8_t IOX_address);
+uint16_t IOX_read(uint8_t i2c_bus, uint8_t IOX_address);
 
 
 #endif //HEMS_H

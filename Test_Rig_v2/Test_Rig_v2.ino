@@ -1,9 +1,15 @@
-//Hyperloop Hover Engine Management System
-//Stationary Test Rig
-//Kevin Kha
+/*Hyperloop Hover Engine Management System
+ * Stationary Test Rig Program
+ * Kevin Kha
+ * 
+ * NOTES:
+ * To allow throttle and height command, make sure that your Serial Monitor is using the "newline" setting.
+ */
 
 #include "Linear_Actuator.h"
 #include "HEMS.h"
+
+#define TEST_RIG_I2C_DIP 0b00000000   //See HEMS.h for how the DIP switch changes I2C hardware addresses
 
 // Global variables.
 String inputString = "";
@@ -18,6 +24,7 @@ void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
   Serial.println("Hyperloop Hover Engine Management System");
   Serial.println("Stationary Test Rig");
+  Serial.println("To allow throttle and height command, Serial Monitor must be using the newline setting.");
   Serial.println("To set the throttle voltage, type in T#### where #### is between 0.00 and 5.00 [V]");
   Serial.println("To set the engine height, type in H#### where #### is between 4.10 and 54.9 [mm]");
   inputString.reserve(5);
@@ -27,7 +34,7 @@ void setup() {
   Wire.begin();
 
   //Setup HEMS
-  myhems = initialize_HEMS(0, 0b00000001);
+  myhems = initialize_HEMS(0, TEST_RIG_I2C_DIP);
   delay(2000);
 }
 

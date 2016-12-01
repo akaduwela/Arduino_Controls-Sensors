@@ -53,31 +53,33 @@ typedef struct{
   //Data Storage
   uint8_t temperatures[NUM_THERMISTORS];
   uint8_t amps;
-  float throttle_voltage;     
+  float throttle_voltage = 0.0;     
   uint8_t rpm;
 
   //Helper Data
-  float timestamp;
-  uint16_t tachometer_counter;
+  float timestamp = 0;
+  uint16_t tachometer_counter = 0;
 
   //Diagnostics
-  uint8_t alarm;
+  uint8_t alarm = 0;
 } HEMS;
 
 HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP);  //See below for I2C DIP addressing
 void update_HEMS(HEMS* engine);
 float runtime();
-
+#ifdef LPC
+float map(float value, float fromLow, float fromHigh, float toLow, float toHigh); //defines map function which doesn't exist in LPC
+#endif
 /*I2C Parameters
 Device Addressing (7-bit addressing):
 ADC LTC2309: 0 ...						-0??10??-	//Tri-state Inputs A0 and A1, however we'll not use float (don't need that many addresses)
 IO MCP23017: 0 1 0 0 A2 A1 A0			-0100???-
 DAC MCP4725: 1 1 0 0 A2(0) A1(1) A0		-110001?-   //A2 and A1 are internal hardware pins; they are set when manufactured.
 
-  		     _________ADC LTC2309 (Thermistors, Ammeter)
-  		     ||  _____DAC MCP4725 (Throttle)
-  		     ||  |____IOX MCP23017 (Tachometer)
-  		     vv  vvvv
+    		   _________ADC LTC2309 (Thermistors, Ammeter)
+    		   ||  _____DAC MCP4725 (Throttle)
+    		   ||  |____IOX MCP23017 (Tachometer)
+    		   vv  vvvv
 I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.*/
 
 const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x28};
@@ -127,7 +129,7 @@ const uint8_t ADC_CHANNEL_SELECT[8] = {
 	LTC2309_CHN_7 | ADC_CONFIG};
 
 //ADC Associated Functions:
-uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel);
+uint16_t ADC_read(uint8_t i2c_bus, uint8_t ADC_address, uint8_t ADC_channel);
 
 
 
@@ -157,7 +159,7 @@ There are other modes that allow for greater configuration (like writing to the 
 #define DAC_MAX 5.00
 
 //DAC Associated Functions:
-void DAC_write(uint8_t DAC_address, uint16_t output_voltage);
+void DAC_write(uint8_t i2c_bus, uint8_t DAC_address, uint16_t output_voltage);
 
 
 
@@ -206,8 +208,8 @@ INTPOL = ?
 #define MCP23017_OLATB 0x15
 
 //IOX Associated Functions:
-void IOX_setup(uint8_t IOX_address);
-uint16_t IOX_read(uint8_t IOX_address);
+void IOX_setup(uint8_t i2c_bus, uint8_t IOX_address);
+uint16_t IOX_read(uint8_t i2c_bus, uint8_t IOX_address);
 
 
 #endif //HEMS_H
