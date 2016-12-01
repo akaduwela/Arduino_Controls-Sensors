@@ -4,15 +4,21 @@
 #define ARDUINO
 //#define LPC
 
-#ifdef ARDUINO
+
+//Includes and Libraries
+#include "math.h"
+
+#ifdef ARDUINO //Arduino Libraries below
 #include "Arduino.h"
 #include "Wire.h"
 
-#else //LPC Libraries below
+#else #ifdef LPC //LPC Libraries below
+#include "i2c.h"
 
 #endif //ARDUINO
 
-#include "math.h"
+
+
 
 #ifndef HEMS_H_
 #define HEMS_H_

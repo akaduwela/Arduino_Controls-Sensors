@@ -102,7 +102,7 @@ void DAC_write(uint8_t bus, uint8_t DAC_address, uint16_t output_voltage) {
   Wire.endTransmission(true);
 
 #else #ifdef LPC
-
+  Chip_I2C_MasterSend(bus, DAC_address, output_buffer, 2);
 
 #endif //ARDUINO
 }
