@@ -44,6 +44,8 @@ void loop() {
   Serial.print("s\t");
   Serial.print(myhems->throttle_voltage);
   Serial.print("V\t");
+  Serial.print(myhems->tachometer_counter);
+  Serial.print("ct\t");
   Serial.print(myhems->rpm);
   Serial.print("RPM\t");
   Serial.print(myhems->amps);

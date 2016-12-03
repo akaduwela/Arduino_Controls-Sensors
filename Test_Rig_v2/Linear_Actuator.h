@@ -2,9 +2,9 @@
 //Linear Actuator Control
 
 //Pin Assignments
-#define LINEAR_FEEDBACK 0 //Analog
-#define H_BRIDGE_0 7 //Digital
-#define H_BRIDGE_1 6 //Digital
+#define LINEAR_FEEDBACK 3 //Analog
+#define H_BRIDGE_0 4 //Digital
+#define H_BRIDGE_1 3 //Digital
 
 //Constraints
 #define HEIGHT_MIN 4.10
