@@ -38,7 +38,7 @@ void update_HEMS(HEMS* engine) {
     int new_temperature = THERMISTOR_BETA / (log(thermistance) - THERMISTOR_OFFSET) - 272;
 
     //Exponential average and record new temperature
-    engine->temperatures[temp_counter] = ((100 - THERMISTOR_AVG_WEIGHT) * new_temperature + THERMISTOR_AVG_WEIGHT * engine->temperatures[temp_counter]) / 100;
+    engine->temperatures[temp_counter] = ((1 - THERMISTOR_AVG_WEIGHT) * new_temperature + THERMISTOR_AVG_WEIGHT * engine->temperatures[temp_counter]);
 
     if (new_temperature > SAFE_TEMPERATURE)
       engine->alarm |= 0b00000001;
@@ -56,15 +56,15 @@ void update_HEMS(HEMS* engine) {
   //Record Motor RPM
   uint16_t current_tachometer_counter = IOX_read(engine->bus, engine->IOX_0_device_address);
   float current_time = runtime();
-  uint16_t current_rpm = 60.0 * (current_tachometer_counter - engine->tachometer_counter) / (current_time - engine->timestamp) / TACHOMETER_TICKS;
-  engine->rpm = ((100 - TACHOMETER_AVG_WEIGHT) * current_rpm + TACHOMETER_AVG_WEIGHT * engine->rpm) / 100;
+  uint16_t current_rpm = 60.0 / TACHOMETER_TICKS * (current_tachometer_counter - engine->tachometer_counter) / (current_time - engine->timestamp);
+  engine->rpm = (1 - TACHOMETER_AVG_WEIGHT) * current_rpm + TACHOMETER_AVG_WEIGHT * engine->rpm;
   engine->timestamp = current_time;
   engine->tachometer_counter = current_tachometer_counter;
 }
 
 uint16_t ADC_read(uint8_t bus, uint8_t ADC_address, uint8_t ADC_channel) {
   uint8_t input_buffer[2];
-  
+
 #ifdef ARDUINO
   Wire.beginTransmission(ADC_address);
   Wire.write(ADC_CHANNEL_SELECT[ADC_channel]);
@@ -73,8 +73,7 @@ uint16_t ADC_read(uint8_t bus, uint8_t ADC_address, uint8_t ADC_channel) {
   input_buffer[0] = Wire.read();  //D11 D10 D9 D8 D7 D6 D5 D4
   input_buffer[1] = Wire.read();  //D3 D2 D1 D0 X X X X
 #else #ifdef LPC
-
-
+  Chip_I2C_MasterRead(I2C_ID_SELECT[bus], ADC_address, input_buffer, 2);
 #endif //ARDUINO
 
   uint16_t ADC_value = (input_buffer[0] << 4) | (input_buffer[1] >> 4);
@@ -86,7 +85,7 @@ uint16_t ADC_read(uint8_t bus, uint8_t ADC_address, uint8_t ADC_channel) {
 
 void DAC_write(uint8_t bus, uint8_t DAC_address, uint16_t output_voltage) {
   uint8_t output_buffer[2] = {DAC_CONFIG | (output_voltage >> 8), output_voltage % 256};
-  
+
 #ifdef ARDUINO
   Wire.beginTransmission(DAC_address);
   Wire.write(output_buffer, 2);   //output the two bytes
@@ -102,7 +101,7 @@ void DAC_write(uint8_t bus, uint8_t DAC_address, uint16_t output_voltage) {
 
 void IOX_setup(uint8_t bus, uint8_t IOX_address) {
   uint8_t output_buffer[2] = {MCP23017_IOCONA, IOX_CONFIG};
-  
+
 #ifdef ARDUINO
   Wire.beginTransmission(IOX_address);
   Wire.write(output_buffer, 2); //IOCON register location, Configuration Byte
@@ -115,7 +114,7 @@ void IOX_setup(uint8_t bus, uint8_t IOX_address) {
 
 uint16_t IOX_read(uint8_t bus, uint8_t IOX_address) {
   uint8_t input_buffer[2];
-  
+
 #ifdef ARDUINO
   Wire.beginTransmission(IOX_address);
   Wire.write(MCP23017_GPIOA); //GPIOAB register location
@@ -124,7 +123,7 @@ uint16_t IOX_read(uint8_t bus, uint8_t IOX_address) {
   input_buffer[0] = Wire.read();	//A7 A6 A5 A4 A3 A2 A1 A0
   input_buffer[1] = Wire.read();  //B7 B6 B5 B4 B3 B2 B1 B0
 #else #ifdef LPC
-
+  Chip_I2C_MasterRead(I2C_ID_SELECT[bus], IOX_address, input_buffer, 2);
 #endif //ARDUINO
 
   uint16_t IOX_value = (input_buffer[0] << 8) | (input_buffer[1] >> 0);
@@ -135,9 +134,9 @@ uint16_t IOX_read(uint8_t bus, uint8_t IOX_address) {
 
 float runtime() {
   float runtime_in_seconds;
-  
+
 #ifdef ARDUINO
-  runtime_in_seconds = micros() / 1000000.0;
+  runtime_in_seconds = millis() / 1000.0;
 #else #ifdef LPC
 
 #endif

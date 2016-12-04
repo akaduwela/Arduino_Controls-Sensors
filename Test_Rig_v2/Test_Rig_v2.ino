@@ -59,6 +59,7 @@ void loop() {
   Serial.print(myhems->temperatures[3]);
   Serial.print("C\t");
   Serial.println(myhems->alarm);
+  delay(500);
 }
 
 void serialEvent() {

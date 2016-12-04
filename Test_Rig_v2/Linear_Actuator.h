@@ -9,7 +9,7 @@
 //Constraints
 #define HEIGHT_MIN 4.10
 #define HEIGHT_MAX 54.9
-#define FEEDBACK_MIN 148 //corresponds to the most retracted state of the linear actuator (should be 54.9mm)
+#define FEEDBACK_MIN 166 //corresponds to the most retracted state of the linear actuator (should be 54.9mm)
 #define FEEDBACK_MAX 1006 //corresponds to the most extended state of the linear actuator (should be 4.1mm)
 #define PRECISION 5
 

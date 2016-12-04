@@ -29,7 +29,7 @@ const I2C_ID_T I2C_ID_SELECT[] = {I2C0, I2C1, I2C2, I2C_NUM_INTERFACE};
 #define SAFE_TEMPERATURE 100      //[C]
 #define SAFE_CURRENT 60           //[A]
 
-#define NUM_THERMISTORS 4
+#define NUM_THERMISTORS 7
 #define REFERENCE_RESISTANCE 5100 //[ohms]
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
@@ -38,7 +38,7 @@ const I2C_ID_T I2C_ID_SELECT[] = {I2C0, I2C1, I2C2, I2C_NUM_INTERFACE};
 #define AMMETER_CONVERSION 0.1136	//[A/mV] 1/AMMETER_SENSITIVITY
 #define AMMETER_VCC 3.3           //Ammeter referenced to 3.3V; everything else runs off 5V
 
-#define TACHOMETER_TICKS 3
+#define TACHOMETER_TICKS 3.0
 
 //ADC Channel Assignments
 #define COILS_FRONT 0
@@ -48,8 +48,8 @@ const I2C_ID_T I2C_ID_SELECT[] = {I2C0, I2C1, I2C2, I2C_NUM_INTERFACE};
 #define AMMETER_CHANNEL 7
 
 //Averaging:
-#define TACHOMETER_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100 Set to 0 if you don't want exponential averaging.
-#define THERMISTOR_AVG_WEIGHT 40 //Out of 100 (value = (old_value * AVG_WEIGHT + (100 - AVG_WEIGHT) * new_value)/100
+#define TACHOMETER_AVG_WEIGHT 0.2 //Out of 1 (value = (old_value * AVG_WEIGHT + (1 - AVG_WEIGHT) * new_value) Set to 0 if you don't want exponential averaging.
+#define THERMISTOR_AVG_WEIGHT 0.4 //Out of 1 (value = (old_value * AVG_WEIGHT + (1 - AVG_WEIGHT) * new_value)
 
 
 typedef struct {
@@ -61,9 +61,9 @@ typedef struct {
 
   //Data Storage
   uint8_t temperatures[NUM_THERMISTORS];
-  uint8_t amps;
+  int amps;
   float throttle_voltage;
-  uint8_t rpm;
+  uint16_t rpm;
 
   //Helper Data
   float timestamp;
@@ -89,7 +89,7 @@ float runtime();
     		   vv  vvvv
   I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.*/
 
-const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x28};
+const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x14};
 const uint8_t DAC_Address_Select[2] = {0x62, 0x63};
 const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
 
