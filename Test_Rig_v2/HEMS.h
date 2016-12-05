@@ -16,7 +16,6 @@
 #include "i2c.h"
 
 //I2C Bus Select
-const I2C_ID_T I2C_ID_SELECT[] = {I2C0, I2C1, I2C2, I2C_NUM_INTERFACE};
 
 #endif //ARDUINO
 
@@ -61,7 +60,7 @@ typedef struct {
 
   //Data Storage
   uint8_t temperatures[NUM_THERMISTORS];
-  int amps;
+  uint8_t amps;
   float throttle_voltage;
   uint16_t rpm;
 
@@ -79,20 +78,21 @@ float runtime();
 
 /*I2C Parameters
   Device Addressing (7-bit addressing):
-  ADC LTC2309: 0 ...						-0??10??-	//Tri-state Inputs A0 and A1, however we'll not use float (don't need that many addresses)
-  IO MCP23017: 0 1 0 0 A2 A1 A0			-0100???-
-  DAC MCP4725: 1 1 0 0 A2(0) A1(1) A0		-110001?-   //A2 and A1 are internal hardware pins; they are set when manufactured.
+  ADC LTC2309: 0 ...						          -0??10??-	  //Tri-state inputs A0 and A1, however we'll not use float (don't need that many addresses)
+  IOX MCP23017: 0 1 0 0 A2 A1 A0			    -0100???-   //Three two-state inputs A0, A1, and A2.
+  DAC MCP4725: 1 1 0 0 A2(0) A1(1) A0		  -110001?-   //Three two-state inputs, A0, A1, and A2, BUT A2 and A1 are internal hardware pins; they are set when manufactured.
 
-    		   _________ADC LTC2309 (Thermistors, Ammeter)
-    		   ||  _____DAC MCP4725 (Throttle)
-    		   ||  |____IOX MCP23017 (Tachometer)
-    		   vv  vvvv
-  I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.*/
+       		   _________ADC LTC2309 (Thermistors, Ammeter)
+       		   ||  _____DAC MCP4725 (Throttle)
+      		   ||  |____IOX MCP23017 (Tachometer)
+     		     vv  vvvv
+  I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.
 
-const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x14};
-const uint8_t DAC_Address_Select[2] = {0x62, 0x63};
-const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
-
+  **Below are included in the .cpp/.c file already; it is only here for reference.
+  const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x14};
+  const uint8_t DAC_Address_Select[2] = {0x62, 0x63};
+  const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
+*/
 
 /*ADC LTC2309
    Max I2C Clock Frequency: 400kHz
@@ -100,7 +100,7 @@ const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
 	1. Master Write: Device Address (with Write Bit)
 	2. Master Write: DIN (Input Data Word)
 	3. Master Write: Device Address (with Read Bit)
-	4. Master Read
+	4. Master Read: 2 Bytes
 
   Input Data Word (6-bit)
   S/D | O/S | S1 | S0 | UNI | SLP | X | X
@@ -123,18 +123,6 @@ const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
 #define LTC2309_CHN_5	0xE0
 #define LTC2309_CHN_6	0xB0
 #define LTC2309_CHN_7	0xF0
-
-//To select the channel, we can OR ADC_CONFIG with channel selection bits.
-const uint8_t ADC_CHANNEL_SELECT[8] = {
-  LTC2309_CHN_0 | ADC_CONFIG,
-  LTC2309_CHN_1 | ADC_CONFIG,
-  LTC2309_CHN_2 | ADC_CONFIG,
-  LTC2309_CHN_3 | ADC_CONFIG,
-  LTC2309_CHN_4 | ADC_CONFIG,
-  LTC2309_CHN_5 | ADC_CONFIG,
-  LTC2309_CHN_6 | ADC_CONFIG,
-  LTC2309_CHN_7 | ADC_CONFIG
-};
 
 //ADC Associated Functions:
 uint16_t ADC_read(uint8_t i2c_bus, uint8_t ADC_address, uint8_t ADC_channel);
