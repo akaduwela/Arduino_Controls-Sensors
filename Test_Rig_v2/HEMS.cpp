@@ -30,10 +30,10 @@ HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP) {
   engine->IOX_0_device_address = IOX_Address_Select[(I2C_DIP >> 0) & 0b111];
 
   IOX_setup(engine->bus, engine->IOX_0_device_address);
-
+  engine->tachometer_counter = IOX_read(engine->bus, engine->IOX_0_device_address);
   engine->throttle_voltage = 0;
   engine->timestamp = 0;
-  engine->tachometer_counter = 0;
+  
   engine->alarm = 0;
 
   return engine;
@@ -48,10 +48,10 @@ void update_HEMS(HEMS* engine) {
 
   //Record Temperatures
   for (int temp_counter = 0; temp_counter < NUM_THERMISTORS; temp_counter++) {
-    float ratio = ADC_read(engine->bus, engine->ADC_0_device_address, temp_counter);
+    float thermistor_ratio = ADC_read(engine->bus, engine->ADC_0_device_address, temp_counter);
 
     //Calculate thermistor resistance
-    float thermistance = (4095 - ratio) * REFERENCE_RESISTANCE / ratio;
+    float thermistance = (4095 - thermistor_ratio) * REFERENCE_RESISTANCE / thermistor_ratio;
 
     //Calculate temperature based on the thermistor resistance (formula based on https://en.wikipedia.org/wiki/Thermistor#B_or_.CE.B2_parameter_equation and datasheet values)
     int new_temperature = THERMISTOR_BETA / (log(thermistance) - THERMISTOR_OFFSET) - 272;
@@ -69,8 +69,8 @@ void update_HEMS(HEMS* engine) {
 
   //Record Motor Controller Current
   //With no current, the ACS759x150B should output 3.3V/2
-  uint16_t blah = ADC_read(engine->bus, engine->ADC_0_device_address, AMMETER_CHANNEL);
-  uint8_t new_amps = abs(blah * 5000.0 / 4095 - 1000 * AMMETER_VCC / 2) * AMMETER_CONVERSION; //Done in mV
+  uint16_t ammeter_ratio = ADC_read(engine->bus, engine->ADC_0_device_address, AMMETER_CHANNEL);
+  uint8_t new_amps = abs(ammeter_ratio * 5000.0 / 4095 - 1000 * AMMETER_VCC / 2) * AMMETER_CONVERSION; //Done in mV
   engine->amps = new_amps;
 
   if (new_amps > SAFE_CURRENT)
@@ -84,7 +84,7 @@ void update_HEMS(HEMS* engine) {
   float current_time = runtime();
   
   uint16_t delta_counter; //Calculate # of pulses since last checked
-  if(current_tachometer_counter > previous_tachometer_counter)
+  if(current_tachometer_counter >= previous_tachometer_counter)
     delta_counter = current_tachometer_counter - previous_tachometer_counter;
   else  //Account for edge case where the binary counter overflows and resets back to 0.
     delta_counter = current_tachometer_counter + (4095 - previous_tachometer_counter);
