@@ -11,6 +11,7 @@
 #ifdef ARDUINO //ARDUINO LIBRARIES BELOW
 #include "Arduino.h"
 #include "Wire.h"
+//#include "SoftI2CMaster.h"
 
 #else #ifdef LPC //LPC LIBRARIES BELOW
 #include "i2c.h"
@@ -25,10 +26,10 @@
 #ifndef HEMS_H_
 #define HEMS_H_
 
-#define SAFE_TEMPERATURE 60      //[C]
+#define SAFE_TEMPERATURE 80      //[C]
 #define SAFE_CURRENT 60           //[A]
 
-#define NUM_THERMISTORS 5
+#define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //[ohms]
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
@@ -37,7 +38,7 @@
 #define AMMETER_CONVERSION 0.1136	//[A/mV] 1/AMMETER_SENSITIVITY
 #define AMMETER_VCC 3.3           //Ammeter referenced to 3.3V; everything else runs off 5V
 
-#define TACHOMETER_TICKS 3
+#define TACHOMETER_TICKS 1
 
 //ADC Channel Assignments
 #define COILS_FRONT 0
@@ -60,7 +61,7 @@ typedef struct {
 
   //Data Storage
   int temperatures[NUM_THERMISTORS];
-  uint16_t amps;
+  uint8_t amps;
   float throttle_voltage;
   uint16_t rpm;
 

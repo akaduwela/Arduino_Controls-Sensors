@@ -20,14 +20,15 @@ const uint8_t ADC_Address[4] = {0x8, 0xA, 0x1A, 0x28};
 
 //To select the channel, we can OR ADC_CONFIG with channel selection bits.
 const uint8_t ADC_CHANNEL_SELECT[8] = {
-  LTC2309_CHN_0 | ADC_CONFIG, 
+  LTC2309_CHN_0 | ADC_CONFIG,
   LTC2309_CHN_1 | ADC_CONFIG,
   LTC2309_CHN_2 | ADC_CONFIG,
   LTC2309_CHN_3 | ADC_CONFIG,
   LTC2309_CHN_4 | ADC_CONFIG,
   LTC2309_CHN_5 | ADC_CONFIG,
   LTC2309_CHN_6 | ADC_CONFIG,
-  LTC2309_CHN_7 | ADC_CONFIG};
+  LTC2309_CHN_7 | ADC_CONFIG
+};
 
 void setup() {
   // put your setup code here, to run once:
@@ -49,29 +50,29 @@ void loop() {
     Wire.write(DAC_CONFIG | (i >> 8));
     Wire.write(i % 1024);
     Wire.endTransmission(true);
-    
-    uint16_t ADC_data = ADC_read(ADC_Address[0], 7);
-    
+
+    uint16_t ADC_data = ADC_read(ADC_Address[3], 0);
+
     Serial.print(i);
     Serial.print("\t");
-    //Serial.print(analogRead(A0)*4);
+    Serial.print(analogRead(A0) * 4);
     Serial.print("\t");
     Serial.println(ADC_data);
     /**/
-  delay(50);
+    delay(50);
   }
 }
 
-uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel){
-  #ifdef ARDUINO
+uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel) {
+#ifdef ARDUINO
   Wire.beginTransmission(ADC_address);
-    Wire.write(ADC_CHANNEL_SELECT[ADC_channel]);
-    Wire.endTransmission(false);
-    Wire.requestFrom(ADC_address, 2, true);
-    uint16_t ADC_value = (Wire.read() << 4) | (Wire.read() >> 4);
-  
-  #else //LPC code
+  Wire.write(ADC_CHANNEL_SELECT[ADC_channel]);
+  Wire.endTransmission(false);
+  Wire.requestFrom(ADC_address, 2, true);
+  uint16_t ADC_value = (Wire.read() << 4) | (Wire.read() >> 4);
 
-  #endif
+#else //LPC code
+
+#endif
   return ADC_value;
 }

@@ -82,6 +82,7 @@ void update_HEMS(HEMS* engine) {
 
 
 
+
   //Record Motor RPM
   uint16_t current_tachometer_counter = IOX_read(engine->bus, engine->IOX_0_device_address) & 0b0000111111111111; //Read only the first 12 bits
   uint16_t previous_tachometer_counter = engine->tachometer_counter;
@@ -99,18 +100,26 @@ void update_HEMS(HEMS* engine) {
   engine->tachometer_counter = current_tachometer_counter;
 }
 
-
-
 uint16_t ADC_read(uint8_t bus, uint8_t ADC_address, uint8_t ADC_channel) {
   uint8_t input_buffer[2];
 
 #ifdef ARDUINO
-  Wire.beginTransmission(ADC_address);
-  Wire.write(ADC_CHANNEL_SELECT[ADC_channel]);
-  Wire.endTransmission(true);
-  Wire.requestFrom(ADC_address, 2, true);
-  input_buffer[0] = Wire.read();  //D11 D10 D9 D8 D7 D6 D5 D4
-  input_buffer[1] = Wire.read();  //D3 D2 D1 D0 X X X X
+  if (bus == 0) {
+    Wire.beginTransmission(ADC_address);
+    Wire.write(ADC_CHANNEL_SELECT[ADC_channel]);
+    Wire.endTransmission(true);
+    Wire.requestFrom(ADC_address, 2, true);
+    input_buffer[0] = Wire.read();  //D11 D10 D9 D8 D7 D6 D5 D4
+    input_buffer[1] = Wire.read();  //D3 D2 D1 D0 X X X X
+  }
+  else if (bus == 1) {
+    Wire1.beginTransmission(ADC_address);
+    Wire1.write(ADC_CHANNEL_SELECT[ADC_channel]);
+    Wire1.endTransmission(true);
+    Wire1.requestFrom(ADC_address, 2, true);
+    input_buffer[0] = Wire1.read();  //D11 D10 D9 D8 D7 D6 D5 D4
+    input_buffer[1] = Wire1.read();  //D3 D2 D1 D0 X X X X
+  }
 #else #ifdef LPC
   Chip_I2C_MasterSend(bus, ADC_address, &ADC_CHANNEL_SELECT[ADC_channel], 1);
   Chip_I2C_MasterRead(bus, ADC_address, input_buffer, 2);
@@ -127,9 +136,16 @@ void DAC_write(uint8_t bus, uint8_t DAC_address, uint16_t output_voltage) {
   uint8_t output_buffer[2] = {DAC_CONFIG | (output_voltage >> 8), output_voltage % 256};
 
 #ifdef ARDUINO
-  Wire.beginTransmission(DAC_address);
-  Wire.write(output_buffer, 2);   //output the two bytes
-  Wire.endTransmission(true);
+  if (bus == 0) {
+    Wire.beginTransmission(DAC_address);
+    Wire.write(output_buffer, 2);   //output the two bytes
+    Wire.endTransmission(true);
+  }
+  else if (bus == 1) {
+    Wire1.beginTransmission(DAC_address);
+    Wire1.write(output_buffer, 2);   //output the two bytes
+    Wire1.endTransmission(true);
+  }
 #else #ifdef LPC
   Chip_I2C_MasterSend(bus, DAC_address, output_buffer, 2);
 #endif //ARDUINO
@@ -143,9 +159,16 @@ void IOX_setup(uint8_t bus, uint8_t IOX_address) {
   uint8_t output_buffer[2] = {MCP23017_IOCONA, IOX_CONFIG};
 
 #ifdef ARDUINO
-  Wire.beginTransmission(IOX_address);
-  Wire.write(output_buffer, 2); //IOCON register location, Configuration Byte
-  Wire.endTransmission(true);
+  if (bus == 0) {
+    Wire.beginTransmission(IOX_address);
+    Wire.write(output_buffer, 2); //IOCON register location, Configuration Byte
+    Wire.endTransmission(true);
+  }
+  else if (bus == 1) {
+    Wire1.beginTransmission(IOX_address);
+    Wire1.write(output_buffer, 2); //IOCON register location, Configuration Byte
+    Wire1.endTransmission(true);
+  }
 #else #ifdef LPC
   Chip_I2C_MasterSend(bus, IOX_address, output_buffer, 2);
 #endif //ARDUINO
@@ -156,12 +179,22 @@ uint16_t IOX_read(uint8_t bus, uint8_t IOX_address) {
   uint8_t input_buffer[2];
 
 #ifdef ARDUINO
-  Wire.beginTransmission(IOX_address);
-  Wire.write(MCP23017_GPIOA); //GPIOAB register location
-  Wire.endTransmission(false);
-  Wire.requestFrom(IOX_address, 2, true);
-  input_buffer[0] = Wire.read();	//A7 A6 A5 A4 A3 A2 A1 A0
-  input_buffer[1] = Wire.read();  //B7 B6 B5 B4 B3 B2 B1 B0
+  if (bus == 0) {
+    Wire.beginTransmission(IOX_address);
+    Wire.write(MCP23017_GPIOA); //GPIOAB register location
+    Wire.endTransmission(false);
+    Wire.requestFrom(IOX_address, 2, true);
+    input_buffer[0] = Wire.read();	//A7 A6 A5 A4 A3 A2 A1 A0
+    input_buffer[1] = Wire.read();  //B7 B6 B5 B4 B3 B2 B1 B0
+  }
+  else if (bus == 1) {
+    Wire1.beginTransmission(IOX_address);
+    Wire1.write(MCP23017_GPIOA); //GPIOAB register location
+    Wire1.endTransmission(false);
+    Wire1.requestFrom(IOX_address, 2, true);
+    input_buffer[0] = Wire1.read();  //A7 A6 A5 A4 A3 A2 A1 A0
+    input_buffer[1] = Wire1.read();  //B7 B6 B5 B4 B3 B2 B1 B0
+  }
 #else #ifdef LPC
   Chip_I2C_MasterCmdRead(bus, IOX_address, MCP23017_GPIOA, input_buffer, 2);
 #endif //ARDUINO

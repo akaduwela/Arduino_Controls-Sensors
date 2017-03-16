@@ -12,12 +12,17 @@
 #include "Arduino.h"
 #include "Wire.h"
 
-#else #ifdef LPC //LPC LIBRARIES BELOW
+#endif //ARDUINO
+
+#ifdef LPC //LPC LIBRARIES BELOW
+#include "stdlib.h"
+#include "initialization.h"
 #include "i2c.h"
+#include "timer.h"
 
 //I2C Bus Select
 
-#endif //ARDUINO
+#endif //LPC
 
 
 
@@ -25,10 +30,11 @@
 #ifndef HEMS_H_
 #define HEMS_H_
 
-#define SAFE_TEMPERATURE 60      //[C]
+#define SAFE_TEMPERATURE 60       //[C]
 #define SAFE_CURRENT 60           //[A]
+#define MAX_THROTTLE_VOLTAGE 5    //[V]
 
-#define NUM_THERMISTORS 5
+#define NUM_THERMISTORS 4
 #define REFERENCE_RESISTANCE 5100 //[ohms]
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
@@ -37,14 +43,15 @@
 #define AMMETER_CONVERSION 0.1136	//[A/mV] 1/AMMETER_SENSITIVITY
 #define AMMETER_VCC 3.3           //Ammeter referenced to 3.3V; everything else runs off 5V
 
-#define TACHOMETER_TICKS 3
+#define TACHOMETER_TICKS 1	// Number of reflective strips on the motor.
 
 //ADC Channel Assignments
-#define COILS_FRONT 0
-#define COILS_BACK 1
-#define INTERIOR_WALL_RIGHT 2
-#define INTERIOR_WALL_LEFT 3
-#define AMMETER_CHANNEL 7
+//#define DAC_VERIFICATION 0
+//#define COILS_FRONT 1
+//#define COILS_BACK 2
+//#define INTERIOR_WALL_RIGHT 3
+//#define INTERIOR_WALL_LEFT 4
+//#define AMMETER_CHANNEL 7
 
 //Averaging:
 #define TACHOMETER_AVG_WEIGHT 0.2 //Out of 1 (value = (old_value * AVG_WEIGHT + (1 - AVG_WEIGHT) * new_value) Set to 0 if you don't want exponential averaging.
@@ -54,23 +61,34 @@
 typedef struct {
   //I2C Parameters
   uint8_t bus;                    //Which I2C bus
-  uint8_t ADC_0_device_address;   //ADC LTC2309 - Thermistors, Ammeter
-  uint8_t DAC_0_device_address;   //DAC MCP4725 - Throttle
-  uint8_t IOX_0_device_address;   //IOX MCP23017 - Tachometer
+  uint8_t ADC_device_address[1];   //ADC LTC2309 - Thermistors, Ammeter
+  uint8_t DAC_device_address[1];   //DAC MCP4725 - Throttle
+  uint8_t IOX_device_address[2];   //IOX MCP23017 - Tachometer    {MAGLEV, NAVIGATION}
+  uint8_t BC_RESET_pin;
+  uint8_t PWR_RESET_pin;
+  uint8_t dI2C_READY_pin;
 
   //Data Storage
-  int temperatures[NUM_THERMISTORS];
-  uint16_t amps;
-  float throttle_voltage;
-  uint16_t rpm;
+  float DAC_diagnostic;
+  uint8_t temperatures[NUM_THERMISTORS];
+  uint8_t amps;
+  uint16_t rpm[2];
 
   //Helper Data
   float timestamp;
-  uint16_t tachometer_counter;
+  uint16_t tachometer_counter[2];
+
+  //Control
+  float throttle_voltage;
+  uint8_t bc_reset;
+  uint8_t pwr_reset;
 
   //Diagnostics
+  uint8_t dI2C_READY;
   uint8_t alarm;
+
 } HEMS;
+
 
 HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP);  //See below for I2C DIP addressing
 void update_HEMS(HEMS* engine);
@@ -81,15 +99,13 @@ float runtime();
   ADC LTC2309: 0 ...						          -0??10??-	  //Tri-state inputs A0 and A1, however we'll not use float (don't need that many addresses)
   IOX MCP23017: 0 1 0 0 A2 A1 A0			    -0100???-   //Three two-state inputs A0, A1, and A2.
   DAC MCP4725: 1 1 0 0 A2(0) A1(1) A0		  -110001?-   //Three two-state inputs, A0, A1, and A2, BUT A2 and A1 are internal hardware pins; they are set when manufactured.
-
        		   _________ADC LTC2309 (Thermistors, Ammeter)
-       		   ||  _____DAC MCP4725 (Throttle)
-      		   ||  |____IOX MCP23017 (Tachometer)
-     		     vv  vvvv
-  I2C_DIP: 0b??XX????   //X = don't cares; can be anything. They're not connected.
-
+       		   ||_____DAC MCP4725 (Throttle)
+      		   |||____IOX MCP23017 (Tachometer 0 & 1); Both share 2/3 address bits, with the third bit hardwired to 0 (for tach0) and 1 (for tach1)
+     		     vvvvv
+  I2C_DIP: 0b?????XXX   //X = don't cares; can be anything. They're not connected.
   **Below are included in the .cpp/.c file already; it is only here for reference.
-  const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x14};
+  const uint8_t ADC_Address_Select[4] = {0x8, 0xA, 0x1A, 0x28};
   const uint8_t DAC_Address_Select[2] = {0x62, 0x63};
   const uint8_t IOX_Address_Select[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
 */
@@ -101,10 +117,8 @@ float runtime();
 	2. Master Write: DIN (Input Data Word)
 	3. Master Write: Device Address (with Read Bit)
 	4. Master Read: 2 Bytes
-
   Input Data Word (6-bit)
   S/D | O/S | S1 | S0 | UNI | SLP | X | X
-
   S/D = Single-Ended/_Differential (We'll always use Single-Ended here, so = 1)
   O/S = Odd/_Sign (Used to select which channel)
   S1 = Channel Select Bit 1 (Also used to select which channel)
@@ -136,15 +150,12 @@ uint16_t ADC_read(uint8_t i2c_bus, uint8_t ADC_address, uint8_t ADC_channel);
 	1. Write Device Address
 	2. 4-bit Configuration: 0000
 	3. 12-bit Output Data:
-
   DAC Configuration (4-bit)
   C2 | C1 | PD1 | PD0
-
   C2 = 0	Command mode bit 2 (0, 0) = Fast Command Mode
   C1 = 0	Command mode bit 1 (0, 0) = Fast Command Mode
   PD1 = 0 Pulldown Resistor (we don't want any)
   PD0 = 0 Pulldown Resistor (we don't want any)
-
   Since the configuration is all 0s, writing to the DAC is simply writing the 12-bit output we want.
   There are other modes that allow for greater configuration (like writing to the EEPROM so that the DAC remembers the output after power-off.)
 */
@@ -163,10 +174,8 @@ void DAC_write(uint8_t i2c_bus, uint8_t DAC_address, uint16_t output_voltage);
    I2C Frequencies: 100kHz, 400kHz, 1.7MHz
   The MCP23017 is a 16-bit IO Expander controlled via I2C; the device is split into two 8-bit ports.
   The device is configured by a shared configuration register, IOCON, which consists of a byte. The settings are as follows:
-
   IOX Configuration Byte (8-bit):
   BANK | MIRROR | SEQOP | DISSLW | HAEN | ODR | INTPOL | NC 				POR (Power-On Reset) : 00000000
-
   BANK = Sets the addressing of the registers of each port. (We want them to alternate, so = 0)
   MIRROR = Sets whether the Interrupt outputs are OR'd together. (We want this active for the BMS, so = 1) Does not affect tachometer
   SEQOP = Sets whether addresses increment. (We want to operate in Byte mode, not Sequential, so = 1)
@@ -174,7 +183,6 @@ void DAC_write(uint8_t i2c_bus, uint8_t DAC_address, uint16_t output_voltage);
   HAEN = Don't care; controls hardware addressing on the 23S17
   ODR = ?
   INTPOL = ?
-
 */
 #define IOX_CONFIG 0x42//0b01110010
 
