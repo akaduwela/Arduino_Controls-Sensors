@@ -8,7 +8,7 @@
 
 #include "HEMS.h"
 
-#define TEST_RIG_I2C_DIP 0b00000000   //See HEMS.h for how the DIP switch changes I2C hardware addresses
+#define TEST_RIG_I2C_DIP 0b11111000   //See HEMS.h for how the DIP switch changes I2C hardware addresses
 
 // Global variables.
 String inputString = "";

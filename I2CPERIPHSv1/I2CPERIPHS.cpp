@@ -30,8 +30,8 @@ HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP) {
   engine->bus = I2C_BUS;
   engine->ADC_device_address[0] = ADC_Address_Select[(I2C_DIP >> 6) & 0b11];
   engine->DAC_device_address[0] = DAC_Address_Select[(I2C_DIP >> 5) & 0b1];
-  engine->IOX_device_address[0] = IOX_Address_Select[(I2C_DIP >> 3) & 0b110];
-  engine->IOX_device_address[1] = IOX_Address_Select[((I2C_DIP >> 3) & 0b110) + 1];
+  engine->IOX_device_address[0] = IOX_Address_Select[(I2C_DIP >> 2) & 0b110];
+  engine->IOX_device_address[1] = IOX_Address_Select[((I2C_DIP >> 2) & 0b110) + 1];
 
   int n;
   for (n = 0; n < 2; n++) {

@@ -33,7 +33,6 @@ void setup() {
   digitalWrite(3, HIGH);
   delay(1000);
   
-  //Setup Linear Actuator
   Wire.begin();
 
   
