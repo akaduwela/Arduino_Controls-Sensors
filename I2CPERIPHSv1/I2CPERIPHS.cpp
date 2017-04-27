@@ -111,7 +111,7 @@ uint8_t update_HEMS(HEMS* engine) {
   //Record Motor Controller Current
   //With no current, the ACS759x150B should output 3.3V/2
   uint16_t ammeter_ratio = ADC_read(engine->bus, engine->ADC_device_address[0], 7);
-  uint8_t new_amps = abs(ammeter_ratio * HEMS_CAL_5V0REF[engine->identity] / MAX12BITVAL - 1000 * HEMS_CAL_3V3REF[engine->identity] / 2) / AMMETER_150A_SENSITIVITY; //Done in mV
+  uint8_t new_amps = abs(1000 * ammeter_ratio * HEMS_CAL_5V0REF[engine->identity] / MAX12BITVAL - 1000 * HEMS_CAL_3V3REF[engine->identity] / 2) / AMMETER_150A_SENSITIVITY; //Done in mV
   engine->amps = new_amps;
 
   if (new_amps > HEMS_MAX_CURRENT)
