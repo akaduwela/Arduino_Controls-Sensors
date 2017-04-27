@@ -28,17 +28,27 @@
 #ifndef I2CPERIPHS_H_
 #define I2CPERIPHS_H_
 
-#define MAX_THROTTLE_VOLTAGE 5    //[V]
+//Number of Boards
+#define NUM_HUBS 3
+#define NUM_HUB_PORTS 4
+#define NUM_HEMS 4
+#define NUM_MAGLEV_BMS 2
+#define NUM_ELECTRONICS_BMS 1
+#define NUM_18V5_BMS 2
 
-#define NUM_THERMISTORS 4
+//Thermistor Data
 #define REFERENCE_RESISTANCE 5100 //[ohms]
 #define THERMISTOR_BETA 3380
 #define THERMISTOR_OFFSET -2.126
 
-#define AMMETER_SENSITIVITY 8.8		//[mV/A] for the 150B version of the sensor
-#define AMMETER_CONVERSION 0.1136	//[A/mV] 1/AMMETER_SENSITIVITY
-#define AMMETER_VCC 3.3           //Ammeter referenced to 3.3V; everything else runs off 5V
+//Ammeter Data
+#define AMMETER_10A_SENSITIVITY 264
+#define AMMETER_50A_SENSITIVITY 40
+#define AMMETER_150A_SENSITIVITY 8.8		//[mV/A] for the 150amp version of the sensor
 
+
+
+//Tachometer Data
 #define TACHOMETER_TICKS 1	// Number of reflective strips on the motor.
 
 //Safety:
@@ -53,7 +63,11 @@
 #define TACHOMETER_AVG_WEIGHT 0.2 //Out of 1 (value = (old_value * AVG_WEIGHT + (1 - AVG_WEIGHT) * new_value) Set to 0 if you don't want exponential averaging.
 #define THERMISTOR_AVG_WEIGHT 0.4 //Out of 1 (value = (old_value * AVG_WEIGHT + (1 - AVG_WEIGHT) * new_value)
 
+#define MAX12BITVAL 4095.0
+
 typedef struct {
+  uint8_t identity;
+  
   //I2C Parameters
   uint8_t bus;                    //Which I2C bus
   uint8_t ADC_device_address[1];   //ADC LTC2309 - Thermistors, Ammeter
@@ -65,7 +79,7 @@ typedef struct {
 
   //Data Storage
   float DAC_diagnostic;
-  int temperatures[NUM_THERMISTORS];
+  int temperatures[4];
   uint8_t amps;
   uint16_t rpm[2];
 
@@ -82,7 +96,7 @@ typedef struct {
   uint8_t alarm;
 } HEMS;
 
-HEMS* initialize_HEMS(uint8_t I2C_BUS, uint8_t I2C_DIP);  //See below for I2C DIP addressing
+HEMS* initialize_HEMS(uint8_t identity);  //See below for I2C DIP addressing
 uint8_t update_HEMS(HEMS* engine);
 int calculate_temperature(uint16_t therm_adc_val);
 float runtime();
@@ -101,20 +115,26 @@ float runtime();
 
 
 typedef struct{   //Designed for 3x 6S batteries; 
+  uint8_t identity;
+
+  //I2C Parameters
   uint8_t bus;                //Only one allowed per bus, since addresses are hard-wired.
+  
+  //Data Storage
   float battery_voltage[3];   //From left to right on the board.
   float cell_voltages[3][6];
-  float conversion[3][6];    
   int temperatures[3][2];
   uint8_t amps;               //No onboard ammeter; relies on data from HEMS or other.
-  
-  uint8_t relay_active;       //Active Low
-  
+
+  //Controls
+  uint8_t relay_pin;
+  uint8_t relay_active_low;       //Active Low
+
   float timestamp;
   uint8_t alarm;
 } Maglev_BMS;
 
-Maglev_BMS* initialize_Maglev_BMS();
+Maglev_BMS* initialize_Maglev_BMS(uint8_t identity);
 uint8_t update_Maglev_BMS(Maglev_BMS* bms);
 
 /*ADC LTC2309

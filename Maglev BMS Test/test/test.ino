@@ -74,6 +74,8 @@ void loop() {
     prev_voltage = 0;
     for (i = 0; i < 6; i++) {
       voltages[i] = ADC_read(I2C_ADC_Maglev_BMS_Addresses[batt], i) / 4096.0 * 5.0 * conversion[batt][i];
+//      Serial.print(voltages[i]);
+//      Serial.print("\t");
       cell_voltages[batt][i] = voltages[i] - prev_voltage;
       prev_voltage = voltages[i];
     }
@@ -92,13 +94,13 @@ void loop() {
   delay(50);
 }
 
-int calculate_temperature(uint16_t therm_adc_val) {
-  //Calculate thermistor resistance
-  float thermistance = therm_adc_val / 4095.0 * REFERENCE_RESISTANCE / (1 - therm_adc_val / 4095.0);
-
-  //Calculate temperature based on the thermistor resistance (formula based on https://en.wikipedia.org/wiki/Thermistor#B_or_.CE.B2_parameter_equation and datasheet values)
-  return THERMISTOR_BETA / (log(thermistance) - THERMISTOR_OFFSET) - 272;
-}
+//int calculate_temperature(uint16_t therm_adc_val) {
+//  //Calculate thermistor resistance
+//  float thermistance = therm_adc_val / 4095.0 * REFERENCE_RESISTANCE / (1 - therm_adc_val / 4095.0);
+//
+//  //Calculate temperature based on the thermistor resistance (formula based on https://en.wikipedia.org/wiki/Thermistor#B_or_.CE.B2_parameter_equation and datasheet values)
+//  return THERMISTOR_BETA / (log(thermistance) - THERMISTOR_OFFSET) - 272;
+//}
 
 uint16_t ADC_read(uint8_t ADC_address, uint8_t ADC_channel) {
   uint8_t input_buffer[2];

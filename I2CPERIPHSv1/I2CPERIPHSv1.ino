@@ -1,14 +1,14 @@
 /*Hyperloop Hover Engine Management System
- * Stationary Test Rig Program
- * Kevin Kha
- * 
- * NOTES:
- * To allow throttle and height command, make sure that your Serial Monitor is using the "newline" setting.
- */
+   Stationary Test Rig Program
+   Kevin Kha
+
+   NOTES:
+   To allow throttle and height command, make sure that your Serial Monitor is using the "newline" setting.
+*/
 
 #include "I2CPERIPHS.h"
 
-#define TEST_RIG_I2C_DIP 0b00000000   //See HEMS.h for how the DIP switch changes I2C hardware addresses
+#define TEST_RIG_I2C_DIP 0b11111000   //See HEMS.h for how the DIP switch changes I2C hardware addresses
 
 // Global variables.
 String inputString = "";
@@ -32,14 +32,14 @@ void setup() {
   pinMode(3, OUTPUT);
   digitalWrite(3, HIGH);
   delay(1000);
-  
+
   Wire.begin();
 
-  
-  
-  
+
+
+
   //Setup HEMS
-  myhems = initialize_HEMS(0, TEST_RIG_I2C_DIP);
+  myhems = initialize_HEMS(0);
   delay(2000);
 }
 
