@@ -80,6 +80,7 @@ typedef struct {
   //Data Storage
   float DAC_diagnostic;
   int temperatures[4];
+  float short_data[2];
   uint8_t amps;
   uint16_t rpm[2];
 
