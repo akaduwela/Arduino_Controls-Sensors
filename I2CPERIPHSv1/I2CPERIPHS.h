@@ -19,6 +19,7 @@
 #include "initialization.h"
 #include "i2c.h"
 #include "timer.h"
+#include "ranging.h"
 
 //I2C Bus Select
 
@@ -46,7 +47,7 @@
 #define AMMETER_50A_SENSITIVITY 40
 #define AMMETER_150A_SENSITIVITY 8.8		//[mV/A] for the 150amp version of the sensor
 
-
+#define NUM_SHORTIR 2
 
 //Tachometer Data
 #define TACHOMETER_TICKS 1	// Number of reflective strips on the motor.
@@ -80,7 +81,7 @@ typedef struct {
   //Data Storage
   float DAC_diagnostic;
   int temperatures[4];
-  float short_data[2];
+  float short_data[NUM_SHORTIR];
   uint8_t amps;
   uint16_t rpm[2];
 
@@ -242,6 +243,5 @@ void DAC_write(uint8_t i2c_bus, uint8_t DAC_address, uint16_t output_voltage);
 //IOX Associated Functions:
 void IOX_setup(uint8_t i2c_bus, uint8_t IOX_address);
 uint16_t IOX_read(uint8_t i2c_bus, uint8_t IOX_address);
-
 
 #endif //I2CPERIPHS_H
